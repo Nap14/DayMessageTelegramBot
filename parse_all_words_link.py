@@ -10,7 +10,7 @@ BASE_URL = "https://dictionary.cambridge.org/"
 HOME_URL = urljoin(BASE_URL, "browse/english/")
 HEADERS = {
     "accept": "*/*",
-    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
 }
 
 
@@ -36,7 +36,9 @@ def parse_links_to_word():
 
         for link in tqdm(links):
             soup = get_soup(link, headers=HEADERS)
-            links_to_words = [link.get("href") + "\n" for link in soup.select(".hlh32 > a")]
+            links_to_words = [
+                link.get("href") + "\n" for link in soup.select(".hlh32 > a")
+            ]
 
             with open(f"Words_links/{letter}_links.txt", "a", encoding="utf-8") as file:
                 file.writelines(links_to_words)
@@ -50,5 +52,5 @@ def main():
     parse_links_to_word()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

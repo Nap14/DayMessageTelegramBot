@@ -27,7 +27,7 @@ class Word:
             "description": self.description,
             "type": self.type,
             "pronounce": self.pronounce,
-            "synonyms": self.synonyms
+            "synonyms": self.synonyms,
         }
 
     def __eq__(self, other):
@@ -41,7 +41,7 @@ class WordParser:
     HEADERS = {
         "accept": "*/*",
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                      "Chrome/109.0.0.0 Safari/537.36"
+        "Chrome/109.0.0.0 Safari/537.36",
     }
 
     def __init__(self):
@@ -71,11 +71,13 @@ class WordParser:
                 description=soup.select_one(".ddef_d").text.strip()[:-1].capitalize(),
                 type=soup.select_one(".dpos").text.title(),
                 pronounce=None,
-                synonyms=None
+                synonyms=None,
             )
             try:
-                word.pronounce = soup.select_one(".dpron").text,
-                word.synonyms = [synonym.text for synonym in soup.select(".synonyms > .lcs > .item")]
+                word.pronounce = (soup.select_one(".dpron").text,)
+                word.synonyms = [
+                    synonym.text for synonym in soup.select(".synonyms > .lcs > .item")
+                ]
             except AttributeError:
                 pass
 
@@ -97,8 +99,8 @@ class WordParser:
 
     def add_to_json(self):
         """added instance of Word to json file
-                :file - name of file
-                :word
+        :file - name of file
+        :word
         """
 
         word_obj = self.word
@@ -123,4 +125,3 @@ class WordParser:
             print("*" * 20)
 
         return word
-
