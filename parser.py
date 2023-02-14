@@ -4,9 +4,34 @@ import string
 from urllib.parse import urljoin
 
 import requests
+import dataclasses
 from bs4 import BeautifulSoup
 
-from word import Word
+
+def get_soup(url: str, headers: dict, *args, **kwargs) -> BeautifulSoup:
+    page = requests.get(url, headers=headers, *args, **kwargs).text
+    return BeautifulSoup(page, "html.parser")
+
+
+@dataclasses.dataclass
+class Word:
+    word: str
+    description: str
+    type: str or None
+    pronounce: str or None
+    synonyms: list or None
+
+    def dict(self):
+        return {
+            "word": self.word,
+            "description": self.description,
+            "type": self.type,
+            "pronounce": self.pronounce,
+            "synonyms": self.synonyms
+        }
+
+    def __eq__(self, other):
+        return self.word == other.word
 
 
 class WordParser:
@@ -33,22 +58,10 @@ class WordParser:
 
         return result
 
-    @staticmethod
-    def get_random_link(letter: str) -> str:
-        """returns a link to a group of words"""
-        with open(f"letters/{letter}.txt", encoding="utf-8") as file:
-            links = [link.strip() for link in file.readlines()]
-
-        return random.choice(links)
-
-    def get_soup(self, url: str, *args, **kwargs) -> BeautifulSoup:
-        page = requests.get(url, headers=self.HEADERS, *args, **kwargs).text
-        return BeautifulSoup(page, "html.parser")
-
     def parse_word_page(self, link_to_word_page: str) -> Word or bool:
         """takes a link to the word page, collects data from it, returns instance of  Word"""
 
-        soup = self.get_soup(urljoin(self.BASE_URL, link_to_word_page))
+        soup = get_soup(urljoin(self.BASE_URL, link_to_word_page), headers=self.HEADERS)
 
         try:
             print(f"get information about {soup.select_one('.hw.dhw').text.title()}")
@@ -74,10 +87,8 @@ class WordParser:
 
     def get_link_to_random_word(self):
         """retrieves one random word page link from the word group page"""
-        link = self.get_random_link(self._letter)
-
-        soup = self.get_soup(link)
-        links_to_words = [link.get("href") for link in soup.select(".hlh32 > a")]
+        with open(f"Words_links/{self._letter}_links.txt", encoding="utf-8") as file:
+            links_to_words = [link.strip() for link in file.readlines()]
 
         print("New link is:")
         print(result := random.choice(links_to_words))
