@@ -37,18 +37,23 @@ class Word:
 class WordParser:
 
     BASE_URL = "https://dictionary.cambridge.org/"
-    HOME_URL = urljoin(BASE_URL, "browse/english/")
+    DICTIONARY_URL = urljoin(BASE_URL, "dictionary/english/")
     HEADERS = {
         "accept": "*/*",
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/109.0.0.0 Safari/537.36",
     }
 
-    def __init__(self):
-        self._letter = self.get_random_letter()
-        self.word = self.validate_word_instance(
-            self.parse_word_page(self.get_link_to_random_word())
-        )
+    def __init__(self, word: str = None):
+        if word:
+            url = urljoin(self.DICTIONARY_URL, word.lower())
+            self._letter = url[0]
+            self.word = self.validate_word_instance(self.parse_word_page(url))
+        else:
+            self._letter = self.get_random_letter()
+            self.word = self.validate_word_instance(
+                self.parse_word_page(self.get_link_to_random_word())
+            )
 
     @staticmethod
     def get_random_letter() -> str:
@@ -105,13 +110,19 @@ class WordParser:
 
         word_obj = self.word
 
-        with open(f"words/{self._letter}_word.json", "rt", encoding="utf-8") as file:
+        with open(f"library/{self._letter}_word.json", "rt", encoding="utf-8") as file:
             ls = json.load(file)
 
         result = ls if isinstance(ls, list) else list(ls)
+        words = [word["word"] for word in result]
+
+        if word_obj.word in words:
+            print(f"{word_obj.word} is already in library")
+            return
+
         result.append(word_obj.dict())
 
-        with open(f"words/{self._letter}_word.json", "w", encoding="utf-8") as file:
+        with open(f"library/{self._letter}_word.json", "w", encoding="utf-8") as file:
             json.dump(result, file, indent=2)
 
         print(f"{word_obj.word} was added")
