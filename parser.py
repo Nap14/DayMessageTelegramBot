@@ -54,7 +54,10 @@ class WordParser:
             self.word = self.validate_word_instance(
                 self.parse_word_page(self.get_link_to_random_word())
             )
-        self.add_to_json()
+        try:
+            self.add_to_json()
+        except json.JSONDecodeError:
+            pass
 
     @staticmethod
     def get_random_letter() -> str:
