@@ -2,9 +2,10 @@ import os
 
 import telebot
 
+import config
 from parser import WordParser
 
-TOKEN = os.environ.get("BOT_TOKEN")
+TOKEN = os.environ.get("BOT_TOKEN") or config.BOT_TOKEN
 
 
 bot = telebot.TeleBot(TOKEN)
