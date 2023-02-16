@@ -47,7 +47,7 @@ class WordParser:
     def __init__(self, word: str = None):
         if word:
             url = urljoin(self.DICTIONARY_URL, word.lower())
-            self._letter = url[0]
+            self._letter = word[0]
             self.word = self.validate_word_instance(self.parse_word_page(url))
         else:
             self._letter = self.get_random_letter()

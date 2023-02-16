@@ -81,10 +81,13 @@ def stop_spamming(message):
 @bot.message_handler(content_types=["text"])
 def get_certain_word(message):
     message_text = message.text.strip("/")
+    if len(message_text.split()) > 1:
+        bot.send_message(message.chat.id, "Please send me one word😉")
+    else:
+        global word
+        word = WordParser(message_text)
+        send_information(message)
     print(message_text)
-    global word
-    word = WordParser(message_text)
-    send_information(message)
 
 
 bot.polling(non_stop=True)
