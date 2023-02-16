@@ -1,6 +1,7 @@
 import os
 
 import telebot
+import schedule
 
 from parser import WordParser
 
@@ -9,6 +10,7 @@ TOKEN = os.environ.get("BOT_TOKEN")
 
 bot = telebot.TeleBot(TOKEN)
 word = WordParser()
+spam = False
 
 
 def send_information(message):
@@ -18,6 +20,8 @@ def send_information(message):
 
 @bot.message_handler(commands=["start"])
 def start(message):
+    global spam
+    spam = True
     marcup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     get = telebot.types.KeyboardButton("/Give me a new word")
     repeat_message = telebot.types.KeyboardButton("/Repeat please")
@@ -27,6 +31,11 @@ def start(message):
     marcup.add(get, repeat_message, transcription, synonyms)
     bot.send_message(message.chat.id, f"Helo {message.from_user.first_name}")
     bot.send_message(message.chat.id, "What do you need?", reply_markup=marcup)
+
+    schedule.every().day.at("12:00").do(get_random_word, message)
+
+    while spam:
+        schedule.run_pending()
 
 
 @bot.message_handler(commands=["get", "Give"])
@@ -59,6 +68,14 @@ def get_synonyms(message):
             bot.send_message(message.chat.id, i)
     else:
         bot.send_message(message.chat.id, "I don't know😞")
+
+
+@bot.message_handler(commands=["stop"])
+def stop_spamming(message):
+    global spam
+    spam = False
+    bot.send_message(message.chat.id, "Good bye")
+    bot.send_message(message.chat.id, "👋")
 
 
 @bot.message_handler(content_types=["text"])
