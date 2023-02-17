@@ -69,6 +69,15 @@ def voice_pronounce(message):
         bot.send_voice(message.chat.id, audio)
 
 
+@bot.message_handler(commands=["read"])
+def voice_description(message):
+    tts = gTTS(word.word.word)
+    tts.save("audio/description.mp3")
+
+    with open("audio/description.mp3", "rb") as audio:
+        bot.send_voice(message.chat.id, audio)
+
+
 @bot.message_handler(commands=["synonyms", "What"])
 def get_synonyms(message):
     synonyms = word.word.synonyms
