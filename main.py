@@ -2,6 +2,7 @@ import os
 
 import telebot
 import schedule
+from gtts import gTTS
 
 from parser import WordParser
 
@@ -25,10 +26,11 @@ def start(message):
     marcup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     get = telebot.types.KeyboardButton("/Give me a new word")
     repeat_message = telebot.types.KeyboardButton("/Repeat please")
-    transcription = telebot.types.KeyboardButton("/How to pronounce it")
+    transcription = telebot.types.KeyboardButton("/Transcription")
     synonyms = telebot.types.KeyboardButton("/What about synonyms?")
+    pronounce = telebot.types.KeyboardButton("/How to pronounce it?")
 
-    marcup.add(get, repeat_message, transcription, synonyms)
+    marcup.add(get, repeat_message, transcription, synonyms, pronounce)
     bot.send_message(message.chat.id, f"Helo {message.from_user.first_name}")
     bot.send_message(message.chat.id, "What do you need?", reply_markup=marcup)
 
@@ -50,13 +52,21 @@ def repeat(message):
     send_information(message)
 
 
-@bot.message_handler(commands=["transcription", "How"])
+@bot.message_handler(commands=["transcription", "Transcription"])
 def get_transcription(message):
     transcription = word.word.pronounce
     if transcription:
         bot.send_message(message.chat.id, word.word.pronounce)
     else:
         bot.send_message(message.chat.id, "have not idea👎")
+
+
+@bot.message_handler(commands=["How", "voice"])
+def voice_pronounce(message):
+    tts = gTTS(word.word.word)
+    tts.save("audio/audio.mp3")
+    with open("audio/audio.mp3", "rb") as audio:
+        bot.send_voice(message.chat.id, audio)
 
 
 @bot.message_handler(commands=["synonyms", "What"])
