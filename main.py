@@ -22,7 +22,6 @@ def send_information(message):
 @bot.message_handler(commands=["start"])
 def start(message):
     global spam
-    spam = True
     marcup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
     get = telebot.types.KeyboardButton("/Give me a new word")
@@ -35,6 +34,11 @@ def start(message):
     bot.send_message(message.chat.id, "What do you need?", reply_markup=marcup)
 
     schedule.every().day.at("12:00").do(get_random_word, message)
+
+    if spam:
+        return
+
+    spam = True
 
     while spam:
         schedule.run_pending()
