@@ -24,13 +24,13 @@ def start(message):
     global spam
     spam = True
     marcup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+
     get = telebot.types.KeyboardButton("/Give me a new word")
-    repeat_message = telebot.types.KeyboardButton("/Repeat please")
     transcription = telebot.types.KeyboardButton("/Transcription")
     synonyms = telebot.types.KeyboardButton("/What about synonyms?")
     pronounce = telebot.types.KeyboardButton("/How to pronounce it?")
 
-    marcup.add(get, repeat_message, transcription, synonyms, pronounce)
+    marcup.add(get, transcription, synonyms, pronounce)
     bot.send_message(message.chat.id, f"Helo {message.from_user.first_name}")
     bot.send_message(message.chat.id, "What do you need?", reply_markup=marcup)
 
