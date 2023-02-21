@@ -35,8 +35,10 @@ def start(message):
     pronounce = telebot.types.KeyboardButton("/How to pronounce it?")
 
     marcup.add(get, transcription, synonyms, pronounce)
+
     bot.send_message(chat.id, f"Helo {message.from_user.first_name}")
     bot.send_message(chat.id, "What do you need?", reply_markup=marcup)
+
 
 
 @bot.message_handler(commands=["get", "Give"])
@@ -106,7 +108,8 @@ def stop_spamming(message):
 def get_certain_word(message):
     chat = Chat.get_chat(message)
     message_text = message.text.strip("/")
-    if len(message_text.split()) > 1:
+
+    if len(message_text.split()) > 1 or not message_text.isalpha():
         bot.send_message(chat.id, "Please send me one word😉")
     else:
         chat.word = WordParser(message_text)
