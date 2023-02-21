@@ -1,6 +1,7 @@
 venv
 letters
 library
+audio
 audio/audio.mp3
 chats/chats.json
 .idea
