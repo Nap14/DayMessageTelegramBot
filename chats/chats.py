@@ -50,3 +50,4 @@ class Chat:
         for chat in cls.chats:
             if chat.id == int(message.chat.id):
                 return chat
+        return cls(message)
