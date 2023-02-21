@@ -40,7 +40,6 @@ def start(message):
     bot.send_message(chat.id, "What do you need?", reply_markup=marcup)
 
 
-
 @bot.message_handler(commands=["get", "Give"])
 def get_random_word(message):
     chat = Chat.get_chat(message)
