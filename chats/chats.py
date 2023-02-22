@@ -1,6 +1,6 @@
 import json
 
-from parser import WordParser
+from parser import get_word
 
 
 class Chat:
@@ -8,24 +8,24 @@ class Chat:
     chats = set()
 
     def __init__(
-        self, message=None, *, chat_id: int = None, word: str = None, spam: bool = None
+        self, message=None, *, chat_id: int = None, word: dict = None, spam: bool = None
     ):
         if message:
             self.id = message.chat.id
-            self.word = WordParser()
+            self.word = get_word()
             self.spam = True
             for chat in self.get_chats():
                 self.chats.add(chat)
         else:
             self.id = chat_id
-            self.word = WordParser(word)
+            self.word = get_word(word["word"])
             self.spam = spam
 
         self.chats.add(self)
         self.save_chats()
 
     def __dict__(self):
-        return {"chat_id": self.id, "word": self.word.word.word, "spam": self.spam}
+        return {"chat_id": self.id, "word": self.word, "spam": self.spam}
 
     def __eq__(self, other):
         return self.id == other.id
