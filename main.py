@@ -6,7 +6,7 @@ import telebot
 import schedule
 from gtts import gTTS
 
-from parser import WordParser
+from parser import get_word
 from chats.chats import Chat
 
 TOKEN = os.environ.get("TEST_TOKEN") or os.environ.get("BOT_TOKEN")
@@ -16,8 +16,8 @@ chats = set(Chat.get_chats())
 
 
 def send_information(chat: Chat):
-    bot.send_message(chat.id, chat.word.word.word)
-    bot.send_message(chat.id, f"Definition - {chat.word.word.description}")
+    bot.send_message(chat.id, chat.word["word"])
+    bot.send_message(chat.id, f"Definition - {chat.word['description']}")
 
 
 def create_keyboard_markup():
@@ -49,7 +49,7 @@ def start(message):
 @bot.message_handler(commands=["get", "Give"])
 def get_random_word(message):
     chat = Chat.get_chat(message)
-    chat.word = WordParser()
+    chat.word = get_word()
     send_information(chat)
     chat.save_chats()
 
@@ -63,9 +63,9 @@ def repeat(message):
 @bot.message_handler(commands=["transcription", "Transcription"])
 def get_transcription(message):
     chat = Chat.get_chat(message)
-    transcription = chat.word.word.pronounce
+    transcription = chat.word["transcription"]
     if transcription:
-        bot.send_message(chat.id, chat.word.word.pronounce)
+        bot.send_message(chat.id, transcription)
     else:
         bot.send_message(chat.id, "have not idea👎")
 
@@ -73,7 +73,7 @@ def get_transcription(message):
 @bot.message_handler(commands=["How", "voice"])
 def voice_pronounce(message):
     chat = Chat.get_chat(message)
-    tts = gTTS(chat.word.word.word)
+    tts = gTTS(chat.word["word"])
     tts.save("audio/audio.mp3")
     with open("audio/audio.mp3", "rb") as audio:
         bot.send_voice(chat.id, audio)
@@ -82,7 +82,7 @@ def voice_pronounce(message):
 @bot.message_handler(commands=["read"])
 def voice_description(message):
     chat = Chat.get_chat(message)
-    tts = gTTS(chat.word.word.word)
+    tts = gTTS(chat.word["description"])
     tts.save("audio/description.mp3")
 
     with open("audio/description.mp3", "rb") as audio:
@@ -92,9 +92,9 @@ def voice_description(message):
 @bot.message_handler(commands=["synonyms", "What"])
 def get_synonyms(message):
     chat = Chat.get_chat(message)
-    synonyms = chat.word.word.synonyms
+    synonyms = chat.word["synonyms"]
     if synonyms:
-        bot.send_message(chat.id, f"Synonyms to {chat.word.word.word} is:")
+        bot.send_message(chat.id, f"Synonyms to {chat.word['word']} is:")
         for i in synonyms:
             bot.send_message(chat.id, i)
     else:
@@ -117,7 +117,7 @@ def get_certain_word(message):
     if len(message_text.split()) > 1 or not message_text.isalpha():
         bot.send_message(chat.id, "Please send me one word😉")
     else:
-        chat.word = WordParser(message_text)
+        chat.word = get_word(message_text)
         send_information(chat)
     chat.save_chats()
     print(message_text)
@@ -126,7 +126,7 @@ def get_certain_word(message):
 def send_message_every_day():
     for chat in chats:
         if chat.spam:
-            chat.word = WordParser()
+            chat.word = get_word()
             send_information(chat)
 
 
