@@ -18,15 +18,15 @@ class Word:
     word: str
     description: str
     type: str or None
-    pronounce: str or None
+    transcription: str or None
     synonyms: list or None
 
-    def dict(self):
+    def __dict__(self):
         return {
             "word": self.word,
             "description": self.description,
             "type": self.type,
-            "pronounce": self.pronounce,
+            "transcription": self.transcription,
             "synonyms": self.synonyms,
         }
 
@@ -75,11 +75,11 @@ class WordParser:
                 word=soup.select_one(".hw.dhw").text.title(),
                 description=soup.select_one(".ddef_d").text.strip()[:-1].capitalize(),
                 type=soup.select_one(".dpos").text.title(),
-                pronounce=None,
+                transcription=None,
                 synonyms=None,
             )
             try:
-                word.pronounce = (soup.select_one(".dpron").text,)
+                word.transcription = (soup.select_one(".dpron").text,)
                 word.synonyms = [
                     synonym.text for synonym in soup.select(".synonyms > .lcs > .item")
                 ]
@@ -120,7 +120,7 @@ class WordParser:
             print(f"{word_obj.word} is already in library")
             return
 
-        result.append(word_obj.dict())
+        result.append(word_obj.__dict__())
 
         with open(f"library/{self._letter}_word.json", "w", encoding="utf-8") as file:
             json.dump(result, file, indent=2)
@@ -136,3 +136,7 @@ class WordParser:
             print("*" * 20)
 
         return word
+
+
+def get_word(word: str = None) -> dict:
+    return WordParser(word).word.__dict__()
