@@ -20,13 +20,7 @@ def send_information(chat: Chat):
     bot.send_message(chat.id, f"Definition - {chat.word.word.description}")
 
 
-@bot.message_handler(commands=["start"])
-def start(message):
-    chat = Chat(message)
-    chat.spam = True
-    chats.add(chat)
-    chat.save_chats()
-
+def create_keyboard_markup():
     marcup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
     get = telebot.types.KeyboardButton("/Give me a new word")
@@ -35,6 +29,18 @@ def start(message):
     pronounce = telebot.types.KeyboardButton("/How to pronounce it?")
 
     marcup.add(get, transcription, synonyms, pronounce)
+
+    return marcup
+
+
+@bot.message_handler(commands=["start"])
+def start(message):
+    chat = Chat(message)
+    chat.spam = True
+    chats.add(chat)
+    chat.save_chats()
+
+    marcup = create_keyboard_markup()
 
     bot.send_message(chat.id, f"Helo {message.from_user.first_name}")
     bot.send_message(chat.id, "What do you need?", reply_markup=marcup)
